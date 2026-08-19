@@ -1,0 +1,8 @@
+root = true
+
+[*.cs]
+#dotnet
+dotnet_diagnostic.IDE0290.severity = none
+
+#resharper
+resharper_convert_to_primary_constructor_highlighting = none
