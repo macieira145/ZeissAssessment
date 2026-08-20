@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using ZeissAssessment.Application.Filters;
 using ZeissAssessment.Application.Interfaces.Repositories;
 using ZeissAssessment.Domain.Entities;
 using ZeissAssessment.Infrastructure.Persistence;
+using ZeissAssessment.Infrastructure.Repositories.Extensions;
 
 namespace ZeissAssessment.Infrastructure.Repositories;
 
@@ -31,5 +33,20 @@ public class ProductRepository(AppDbContext dbContext) : IProductRepository
     public void Remove(Product product, CancellationToken cancellationToken)
     {
         dbContext.Remove(product);
+    }
+
+    public async Task<ICollection<Product>> Search(ProductSearchFilter filter, CancellationToken cancellationToken)
+    {
+        var products = await dbContext.Products.AddSearchFilters(filter).ToListAsync(cancellationToken);
+
+        return products;
+    }
+
+    public async Task<ICollection<Product>> StockLevelSearch(ProductStockLevelFilter filter,
+        CancellationToken cancellationToken)
+    {
+        var products = await dbContext.Products.AddStockLevelFilters(filter).ToListAsync(cancellationToken);
+
+        return products;
     }
 }

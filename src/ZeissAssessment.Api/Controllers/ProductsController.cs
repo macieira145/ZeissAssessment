@@ -68,4 +68,23 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<ProductResponse>>> Search([FromQuery] SearchProductsRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await productService.Search(request, cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpGet("stock-level")]
+    public async Task<ActionResult<IEnumerable<ProductResponse>>> StockLevelSearch(
+        [FromQuery] StockLevelProductsRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await productService.StockLevelSearch(request, cancellationToken);
+
+        return Ok(response);
+    }
 }

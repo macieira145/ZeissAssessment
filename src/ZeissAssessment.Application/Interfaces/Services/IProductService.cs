@@ -14,4 +14,10 @@ public interface IProductService
     public Task RemoveAsync(int productId, CancellationToken cancellationToken);
     public Task<ProductResponse> IncrementStock(int productId, int stock, CancellationToken cancellationToken);
     public Task<ProductResponse> DecrementStock(int productId, int stock, CancellationToken cancellationToken);
+
+    public Task<IEnumerable<ProductResponse>>
+        Search(SearchProductsRequest request, CancellationToken cancellationToken);
+
+    public Task<IEnumerable<ProductResponse>> StockLevelSearch(StockLevelProductsRequest request,
+        CancellationToken cancellationToken);
 }

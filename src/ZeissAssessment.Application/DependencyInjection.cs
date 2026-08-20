@@ -24,7 +24,11 @@ public static class DependencyInjection
 
     private static IServiceCollection AddMappers(this IServiceCollection services)
     {
+        // entity mappers
         services.AddScoped<ProductMapper>();
+
+        // filter mappers
+        services.AddScoped<ProductFilterMapper>();
 
         return services;
     }

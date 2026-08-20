@@ -8,21 +8,25 @@ using ZeissAssessment.Domain.Entities;
 
 namespace ZeissAssessment.Application.Services;
 
-public class ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork, ProductMapper mapper)
+public class ProductService(
+    IProductRepository productRepository,
+    IUnitOfWork unitOfWork,
+    ProductMapper productMapper,
+    ProductFilterMapper productFilterMapper)
     : IProductService
 {
     public async Task<ProductResponse> GetByIdAsync(int productId, CancellationToken cancellationToken)
     {
         var product = await GetOrThrowAsync(productId, cancellationToken);
 
-        return mapper.ToResponse(product);
+        return productMapper.ToResponse(product);
     }
 
     public async Task<IEnumerable<ProductResponse>> GetAllAsync(CancellationToken cancellationToken)
     {
         var products = await productRepository.GetAllAsync(cancellationToken);
 
-        return mapper.ToResponse(products);
+        return productMapper.ToResponse(products);
     }
 
     public Task<ProductResponse> CreateAsync(Product product, CancellationToken cancellationToken)
@@ -33,13 +37,13 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
     public async Task<ProductResponse> CreateAsync(CreateProductRequest productRequest,
         CancellationToken cancellationToken)
     {
-        var product = mapper.ToEntity(productRequest);
+        var product = productMapper.ToEntity(productRequest);
 
         var createdProduct = await productRepository.CreateAsync(product, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var response = mapper.ToResponse(createdProduct);
+        var response = productMapper.ToResponse(createdProduct);
 
         return response;
     }
@@ -49,11 +53,11 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
     {
         var product = await GetOrThrowAsync(id, cancellationToken);
 
-        mapper.UpdateEntity(productRequest, product);
+        productMapper.UpdateEntity(productRequest, product);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var response = mapper.ToResponse(product);
+        var response = productMapper.ToResponse(product);
 
         return response;
     }
@@ -77,11 +81,11 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
         var product = await GetOrThrowAsync(productId, cancellationToken);
 
         product.IncrementStock(stock);
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        var response = mapper.ToResponse(product);
-        
+
+        var response = productMapper.ToResponse(product);
+
         return response;
     }
 
@@ -90,11 +94,35 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
         var product = await GetOrThrowAsync(productId, cancellationToken);
 
         product.DecrementStock(stock);
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        var response = mapper.ToResponse(product);
-        
+
+        var response = productMapper.ToResponse(product);
+
+        return response;
+    }
+
+    public async Task<IEnumerable<ProductResponse>> Search(SearchProductsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var filter = productFilterMapper.ToFilter(request);
+
+        var products = await productRepository.Search(filter, cancellationToken);
+
+        var response = productMapper.ToResponse(products);
+
+        return response;
+    }
+
+    public async Task<IEnumerable<ProductResponse>> StockLevelSearch(StockLevelProductsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var filter = productFilterMapper.ToFilter(request);
+
+        var products = await productRepository.StockLevelSearch(filter, cancellationToken);
+
+        var response = productMapper.ToResponse(products);
+
         return response;
     }
 
