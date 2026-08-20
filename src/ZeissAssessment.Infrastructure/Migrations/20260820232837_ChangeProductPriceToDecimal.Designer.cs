@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZeissAssessment.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using ZeissAssessment.Infrastructure.Persistence;
 namespace ZeissAssessment.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260820232837_ChangeProductPriceToDecimal")]
+    partial class ChangeProductPriceToDecimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +58,7 @@ namespace ZeissAssessment.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("ZeissAssessment.Domain.Entities.Product", b =>
@@ -72,7 +75,7 @@ namespace ZeissAssessment.Infrastructure.Migrations
 
                             b1.HasKey("ProductId");
 
-                            b1.ToTable("Products", (string)null);
+                            b1.ToTable("Products");
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");

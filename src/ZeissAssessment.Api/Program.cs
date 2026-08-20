@@ -4,13 +4,14 @@ using Serilog;
 using ZeissAssessment.Application;
 using ZeissAssessment.Filters;
 using ZeissAssessment.Infrastructure;
+using ZeissAssessment.Infrastructure.Extensions;
 using ZeissAssessment.Middleware;
 
 namespace ZeissAssessment;
 
 public class Program
-{   
-    public static void Main(string[] args)
+{
+    public static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
@@ -31,10 +32,7 @@ public class Program
 
         builder.Services.AddControllers(options => options.Filters.Add<ValidateModelFilter>());
 
-        builder.Services.Configure<ApiBehaviorOptions>(options =>
-        {
-            options.SuppressModelStateInvalidFilter = true;
-        });
+        builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
@@ -54,6 +52,8 @@ public class Program
         builder.Services.AddApplication();
 
         var app = builder.Build();
+
+        await app.ApplyMigrationsAndSeedAsync();
 
         app.UseSerilogRequestLogging();
 

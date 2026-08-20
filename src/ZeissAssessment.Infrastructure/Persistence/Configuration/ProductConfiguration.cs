@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZeissAssessment.Domain.Entities;
 
@@ -17,6 +18,14 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasIndex(p => p.Id).IsUnique();
 
         builder.Property(p => p.Name).IsRequired().HasMaxLength(200);
+
+        builder.Property(p => p.Price).HasPrecision(18, 2);
+
+        builder.Property(p => p.Created)
+            .IsRequired()
+            .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+        builder.Property(p => p.Updated).IsRequired();
 
         builder.OwnsOne(p => p.Stock, stock =>
         {

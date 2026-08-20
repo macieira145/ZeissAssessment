@@ -21,4 +21,35 @@ public class AppDbContext : DbContext
         
         base.OnModelCreating(modelBuilder);
     }
+
+    public override int SaveChanges()
+    {
+        ApplyAuditTimestamps();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ApplyAuditTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void ApplyAuditTimestamps()
+    {
+        var now = DateTime.UtcNow;
+
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.Created = now;
+                    entry.Entity.Updated = now;
+                    break;
+                case EntityState.Modified:
+                    entry.Entity.Updated = now;
+                    break;
+            }
+        }
+    }
 }
