@@ -13,12 +13,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 {
     public async Task<ProductResponse> GetByIdAsync(int productId, CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetByIdAsync(productId, cancellationToken);
-
-        if (product == null)
-        {
-            throw new NotFoundException(nameof(Product), productId);
-        }
+        var product = await GetOrThrowAsync(productId, cancellationToken);
 
         return mapper.ToResponse(product);
     }
@@ -52,12 +47,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
     public async Task<ProductResponse> UpdateAsync(int id, UpdateProductRequest productRequest,
         CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetByIdAsync(id, cancellationToken);
-
-        if (product == null)
-        {
-            throw new NotFoundException(nameof(Product), id);
-        }
+        var product = await GetOrThrowAsync(id, cancellationToken);
 
         mapper.UpdateEntity(productRequest, product);
 
@@ -70,12 +60,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 
     public async Task RemoveAsync(int productId, CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetByIdAsync(productId, cancellationToken);
-
-        if (product == null)
-        {
-            throw new NotFoundException(nameof(Product), productId);
-        }
+        var product = await GetOrThrowAsync(productId, cancellationToken);
 
         productRepository.Remove(product, cancellationToken);
 
@@ -85,5 +70,43 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
         {
             throw PersistenceException.DeleteFailed(nameof(Product), productId);
         }
+    }
+
+    public async Task<ProductResponse> IncrementStock(int productId, int stock, CancellationToken cancellationToken)
+    {
+        var product = await GetOrThrowAsync(productId, cancellationToken);
+
+        product.IncrementStock(stock);
+        
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        var response = mapper.ToResponse(product);
+        
+        return response;
+    }
+
+    public async Task<ProductResponse> DecrementStock(int productId, int stock, CancellationToken cancellationToken)
+    {
+        var product = await GetOrThrowAsync(productId, cancellationToken);
+
+        product.DecrementStock(stock);
+        
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        var response = mapper.ToResponse(product);
+        
+        return response;
+    }
+
+    private async Task<Product> GetOrThrowAsync(int productId, CancellationToken cancellationToken)
+    {
+        var product = await productRepository.GetByIdAsync(productId, cancellationToken);
+
+        if (product == null)
+        {
+            throw new NotFoundException(nameof(Product), productId);
+        }
+
+        return product;
     }
 }

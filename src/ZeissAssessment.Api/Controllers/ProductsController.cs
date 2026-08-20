@@ -50,4 +50,22 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPost("{productId:int}/add-to-stock/{quantity:int}")]
+    public async Task<ActionResult<ProductResponse>> AddToStock([FromRoute] int productId, [FromRoute] int quantity,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await productService.IncrementStock(productId, quantity, cancellationToken);
+
+        return Ok(response);
+    }
+
+    [HttpPost("{productId:int}/decrement-stock/{quantity:int}")]
+    public async Task<ActionResult<ProductResponse>> DecrementStock([FromRoute] int productId, [FromRoute] int quantity,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await productService.DecrementStock(productId, quantity, cancellationToken);
+
+        return Ok(response);
+    }
 }

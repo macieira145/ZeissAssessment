@@ -21,7 +21,7 @@ public sealed class Stock : IEquatable<Stock>
         return new Stock(quantity);
     }
 
-    public Stock Add(int amount)
+    public Stock Increment(int amount)
     {
         if (amount < 0)
         {

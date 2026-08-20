@@ -12,4 +12,6 @@ public interface IProductService
         CancellationToken cancellationToken);
 
     public Task RemoveAsync(int productId, CancellationToken cancellationToken);
+    public Task<ProductResponse> IncrementStock(int productId, int stock, CancellationToken cancellationToken);
+    public Task<ProductResponse> DecrementStock(int productId, int stock, CancellationToken cancellationToken);
 }
