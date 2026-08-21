@@ -30,11 +30,20 @@ By default this runs in the `Development` environment (via `launchSettings.json`
 - Applies EF Core migrations and seeds sample data automatically on startup (see below).
 - Serves Swagger UI at the application root (`/`).
 
-If running outside of `Development`, ensure a valid `ConnectionStrings:DefaultConnection` value is supplied via `appsettings.json`, environment variables, or user secrets — `appsettings.json` ships with this value empty intentionally, since only local/dev configuration should carry a real connection string in source control.
+If running outside of `Development`, ensure a valid `ConnectionStrings:DefaultConnection` value is supplied via `appsettings.json`, environment variables, or user secrets. `appsettings.json` ships with this value empty intentionally, since only local/dev configuration should carry a real connection string in source control. Outside of `Development`, migrations are not applied automatically; see below.
 
 ### Migrations and seeding
 
-On startup, `app.ApplyMigrationsAndSeedAsync()` (`src/ZeissAssessment.Infrastructure/Extensions`) applies any pending EF Core migrations and, if the `Products` table is empty, seeds it with 80 generated products (see [Data seeding](#data-seeding)). There is no separate manual migration step to run — starting the API against a fresh database is sufficient.
+Applying migrations is decoupled from starting the API, so that a schema change is an explicit, auditable step rather than something that happens implicitly on every app boot. This also avoids multiple app instances racing to apply the same migration concurrently against the same database.
+
+- **`Development`**: on startup, the API automatically applies any pending EF Core migrations and, if the `Products` table is empty, seeds it with 80 generated products (see [Data seeding](#data-seeding)). No manual step is needed; `dotnet run` against a fresh database is sufficient.
+- **Any other environment**: migrations must be applied as a separate step, before starting the API, by running:
+
+  ```bash
+  dotnet ZeissAssessment.Api.dll --migrate
+  ```
+
+  (or `dotnet run --project src/ZeissAssessment.Api -- --migrate` from source). This applies pending migrations against the configured connection string and exits; it does not start the web server. In a real deployment this would run as a release/CI-CD step or an init container/job, ahead of rolling out the app instances. Seeding never runs outside of `Development`.
 
 ### Running the tests
 

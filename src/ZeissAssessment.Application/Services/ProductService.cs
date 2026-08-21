@@ -15,6 +15,9 @@ public class ProductService(
     ProductFilterMapper productFilterMapper)
     : IProductService
 {
+    private const int MaxConcurrencyRetries = 3;
+
+
     public async Task<ProductResponse> GetByIdAsync(int productId, CancellationToken cancellationToken)
     {
         var product = await GetOrThrowAsync(productId, cancellationToken);
@@ -78,28 +81,44 @@ public class ProductService(
 
     public async Task<ProductResponse> IncrementStock(int productId, int stock, CancellationToken cancellationToken)
     {
-        var product = await GetOrThrowAsync(productId, cancellationToken);
+        var product = await ExecuteWithConcurrencyRetryAsync(
+            productId,
+            p => p.IncrementStock(stock),
+            cancellationToken);
 
-        product.IncrementStock(stock);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        var response = productMapper.ToResponse(product);
-
-        return response;
+        return productMapper.ToResponse(product);
     }
 
     public async Task<ProductResponse> DecrementStock(int productId, int stock, CancellationToken cancellationToken)
     {
-        var product = await GetOrThrowAsync(productId, cancellationToken);
+        var product = await ExecuteWithConcurrencyRetryAsync(
+            productId,
+            p => p.DecrementStock(stock),
+            cancellationToken);
 
-        product.DecrementStock(stock);
+        return productMapper.ToResponse(product);
+    }
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+    private async Task<Product> ExecuteWithConcurrencyRetryAsync(int productId, Action<Product> mutate,
+        CancellationToken cancellationToken)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            var product = await GetOrThrowAsync(productId, cancellationToken);
 
-        var response = productMapper.ToResponse(product);
+            mutate(product);
 
-        return response;
+            try
+            {
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return product;
+            }
+            catch (ConcurrencyConflictException) when (attempt < MaxConcurrencyRetries)
+            {
+                unitOfWork.DetachAllTrackedEntities();
+            }
+        }
     }
 
     public async Task<IEnumerable<ProductResponse>> Search(SearchProductsRequest request,

@@ -4,4 +4,5 @@ public interface IUnitOfWork
 {
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     public int SaveChanges();
+    public void DetachAllTrackedEntities();
 }

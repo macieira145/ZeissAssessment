@@ -29,6 +29,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Updated).IsRequired();
 
+        builder.Property(p => p.RowVersion).IsRowVersion();
+
         builder.OwnsOne(p => p.Stock, stock =>
         {
             stock.Property(s => s.Quantity)

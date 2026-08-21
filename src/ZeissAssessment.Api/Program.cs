@@ -53,7 +53,23 @@ public class Program
 
         var app = builder.Build();
 
-        await app.ApplyMigrationsAndSeedAsync();
+        // Standalone migration mode: run as a dedicated release/init step (e.g. `dotnet ZeissAssessment.dll --migrate`)
+        // against the target environment's database, then exit. This keeps schema changes an explicit,
+        // auditable deploy action instead of something that happens implicitly whenever an app instance boots.
+        if (args.Contains("--migrate"))
+        {
+            Log.Information("Running in migration-only mode");
+            await app.MigrateDatabaseAsync();
+            return;
+        }
+
+        if (app.Environment.IsDevelopment())
+        {
+            // Convenience for local development only: keep the local DB schema in sync automatically
+            // and seed sample data, so `dotnet run` "just works" without a separate migration step.
+            await app.MigrateDatabaseAsync();
+            await app.SeedDevelopmentDataAsync();
+        }
 
         app.UseSerilogRequestLogging();
 

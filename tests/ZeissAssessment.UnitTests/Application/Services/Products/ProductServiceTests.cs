@@ -226,6 +226,40 @@ public class ProductServiceTests
     }
 
     [Test]
+    public async Task DecrementStock_ShouldRetryAndSucceed_WhenConcurrencyConflictOccursOnce()
+    {
+        // Arrange
+        var product = new ProductBuilder().WithId(1).WithStock(10).Build();
+        _productRepository.Setup(r => r.GetByIdAsync(1, CancellationToken.None)).ReturnsAsync(product);
+        _unitOfWork.SetupSequence(u => u.SaveChangesAsync(CancellationToken.None))
+            .ThrowsAsync(new ConcurrencyConflictException(nameof(Product), 1))
+            .ReturnsAsync(1);
+
+        // Act
+        var response = await _sut.DecrementStock(1, 4, CancellationToken.None);
+
+        // Assert: GetOrThrowAsync is re-invoked after the retry and re-applies the mutation to the same
+        // mocked product instance (10 -> 6 on the failed attempt, then 6 -> 2 on the retried attempt).
+        response.Stock.ShouldBe(2);
+        _unitOfWork.Verify(u => u.DetachAllTrackedEntities(), Times.Once);
+        _unitOfWork.Verify(u => u.SaveChangesAsync(CancellationToken.None), Times.Exactly(2));
+    }
+
+    [Test]
+    public async Task DecrementStock_ShouldThrowConcurrencyConflictException_WhenRetriesExhausted()
+    {
+        // Arrange
+        var product = new ProductBuilder().WithId(1).WithStock(100).Build();
+        _productRepository.Setup(r => r.GetByIdAsync(1, CancellationToken.None)).ReturnsAsync(product);
+        _unitOfWork.Setup(u => u.SaveChangesAsync(CancellationToken.None))
+            .ThrowsAsync(new ConcurrencyConflictException(nameof(Product), 1));
+
+        // Act & Assert
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            _sut.DecrementStock(1, 4, CancellationToken.None));
+    }
+
+    [Test]
     public async Task Search_ShouldReturnMappedFilteredProducts_WhenRequestHasFilters()
     {
         // Arrange

@@ -8,6 +8,7 @@ public class Product : BaseEntity
     public required string Description { get; set; }
     public required decimal Price { get; set; }
     public required Stock Stock { get; set; }
+    public byte[] RowVersion { get; set; } = [];
 
     public void IncrementStock(int quantity)
     {
