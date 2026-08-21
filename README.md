@@ -17,7 +17,7 @@ The API depends on a SQL Server instance, provided via Docker Compose. From the 
 docker compose up -d
 ```
 
-This starts a `mcr.microsoft.com/mssql/server:2025-latest` container (`zeiss-assessment`) listening on `localhost:1433`, with credentials matching the default connection string in `appsettings.Development.json` (`sa` / `YourStrong!Passw0rd`). No manual database creation is required — see [Migrations and seeding](#migrations-and-seeding) below.
+This starts a `mcr.microsoft.com/mssql/server:2025-latest` container (`zeiss-assessment`) listening on `localhost:1433`, with credentials matching the default connection string in `appsettings.Development.json`. No manual database creation is required — see [Migrations and seeding](#migrations-and-seeding) below.
 
 ### Running the API
 
