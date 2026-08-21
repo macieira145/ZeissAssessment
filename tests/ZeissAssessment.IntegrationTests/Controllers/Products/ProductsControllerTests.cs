@@ -35,7 +35,7 @@ public class ProductsControllerTests : ProductsApiTestBase
         var persisted = await FindProductAsync(body!.Id);
         persisted.ShouldSatisfyAllConditions(
             () => persisted.ShouldNotBeNull(),
-            () => persisted!.Id.ShouldBeGreaterThan(0),
+            () => persisted!.Id.ShouldBeInRange(100_000, 999_999),
             () => persisted!.Name.ShouldBe("Integration Widget"),
             () => persisted!.Description.ShouldBe("Created via integration test."),
             () => persisted!.Price.ShouldBe(15.50m),

@@ -16,8 +16,10 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         modelBuilder.HasSequence<int>("ProductIdSequence", schema: "dbo")
-            .StartsAt(1)
-            .IncrementsBy(1);
+            .StartsAt(100_000)
+            .IncrementsBy(1)
+            .HasMin(100_000)
+            .HasMax(999_999);
         
         base.OnModelCreating(modelBuilder);
     }

@@ -17,6 +17,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.HasIndex(p => p.Id).IsUnique();
 
+        builder.ToTable(t => t.HasCheckConstraint("CK_Product_Id_Range", "[Id] BETWEEN 100000 AND 999999"));
+
         builder.Property(p => p.Name).IsRequired().HasMaxLength(200);
 
         builder.Property(p => p.Price).HasPrecision(18, 2);
