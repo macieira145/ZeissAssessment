@@ -1,0 +1,136 @@
+{
+  "info": {
+    "name": "ZeissAssessment API",
+    "description": "Collection for testing the ZeissAssessment Products API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Product By Id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Zeiss Lens 50mm\",\n  \"description\": \"High quality prime lens with excellent sharpness.\",\n  \"price\": 499.99,\n  \"stock\": 25\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Zeiss Lens 50mm Updated\",\n  \"description\": \"Updated description for the lens.\",\n  \"price\": 549.99\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"]
+            }
+          }
+        },
+        {
+          "name": "Add To Stock",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1/add-to-stock/10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1", "add-to-stock", "10"]
+            }
+          }
+        },
+        {
+          "name": "Decrement Stock",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1/decrement-stock/10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1", "decrement-stock", "10"]
+            }
+          }
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/search?Name=Lens&MinPrice=100&MaxPrice=1000",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "search"],
+              "query": [
+                { "key": "Name", "value": "Lens" },
+                { "key": "MinPrice", "value": "100" },
+                { "key": "MaxPrice", "value": "1000" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Stock Level Search",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/stock-level?MinStock=5&MaxStock=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "stock-level"],
+              "query": [
+                { "key": "MinStock", "value": "5" },
+                { "key": "MaxStock", "value": "50" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
