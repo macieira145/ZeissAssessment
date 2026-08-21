@@ -27,10 +27,13 @@ public class ProductsControllerTests : ProductsApiTestBase
         var httpResponse = await Client.PostAsJsonAsync("/api/products", request);
 
         // Assert
-        httpResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        httpResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         var body = await httpResponse.Content.ReadFromJsonAsync<ProductResponse>();
         body.ShouldNotBeNull();
+
+        httpResponse.Headers.Location.ShouldNotBeNull();
+        httpResponse.Headers.Location!.ToString().ShouldEndWith($"/api/products/{body!.Id}");
 
         var persisted = await FindProductAsync(body!.Id);
         persisted.ShouldSatisfyAllConditions(
@@ -75,7 +78,7 @@ public class ProductsControllerTests : ProductsApiTestBase
         var httpResponse = await Client.PostAsJsonAsync("/api/products", request);
 
         // Assert
-        httpResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        httpResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         var body = await httpResponse.Content.ReadFromJsonAsync<ProductResponse>();
         var persisted = await FindProductAsync(body!.Id);
         persisted!.Price.ShouldBe(20.00m);

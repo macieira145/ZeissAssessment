@@ -31,7 +31,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     {
         var product = await productService.CreateAsync(request, cancellationToken);
 
-        return Ok(product);
+        return CreatedAtAction(nameof(GetById), new { productId = product.Id }, product);
     }
 
     [HttpPut("{productId:int}")]
