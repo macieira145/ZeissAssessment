@@ -57,6 +57,17 @@ This runs both the unit test suite (`tests/ZeissAssessment.UnitTests`, NUnit + M
 
 Postman collection and environment files are provided under `postman/` for manual exploration of the API surface.
 
+### Continuous integration
+
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push to `main`. It:
+
+1. Checks out the repository.
+2. Sets up the .NET 10 SDK.
+3. Caches NuGet packages, keyed on the hash of all `.csproj` files, so `dotnet restore` doesn't re-download unchanged dependencies on every run.
+4. Restores, builds (`Release`, `--no-restore`), and runs `dotnet test` (`--no-build`) against the full solution, covering both the unit and integration test suites described above. Since the integration tests depend on Docker (via Testcontainers), the workflow relies on the Docker daemon already available on GitHub's `ubuntu-latest` runners rather than provisioning one itself.
+
+The workflow only builds and tests; it does not publish artifacts or deploy, since no deployment target is defined for this assessment project.
+
 ## 2. Architecture and conventions
 
 ### Project structure
