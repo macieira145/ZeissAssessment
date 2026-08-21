@@ -9,6 +9,7 @@ namespace ZeissAssessment.Application.Mappers;
 public partial class ProductMapper
 {
     [MapProperty($"{nameof(Product.Stock)}.{nameof(Stock.Quantity)}", nameof(ProductResponse.Stock))]
+    [MapperIgnoreSource(nameof(Product.RowVersion))]
     public partial ProductResponse ToResponse(Product product);
 
     public partial ICollection<ProductResponse> ToResponse(ICollection<Product> products);
@@ -31,5 +32,6 @@ public partial class ProductMapper
     [MapperIgnoreTarget(nameof(Product.Created))]
     [MapperIgnoreTarget(nameof(Product.Updated))]
     [MapperIgnoreTarget(nameof(Product.Stock))]
+    [MapperIgnoreTarget(nameof(Product.RowVersion))]
     public partial void UpdateEntity(UpdateProductRequest request, Product target);
 }
